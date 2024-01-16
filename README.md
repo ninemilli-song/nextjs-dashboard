@@ -6,3 +6,5 @@ For more information, see the [course curriculum](https://nextjs.org/learn) on t
 
 study:
 https://nextjs.org/learn/dashboard-app/optimizing-fonts-images
+
+https://nextjs.org/learn/dashboard-app/error-handling
