@@ -1,3 +1,12 @@
+/*
+ * @Author: ninemilli.song ninemilli_song@163.com
+ * @Date: 2023-11-29 20:44:04
+ * @LastEditors: Please set LastEditors
+ * @LastEditTime: 2024-02-03 11:20:51
+ * @FilePath: /nextjs-dashboard/app/page.tsx
+ * @Description: 
+ * 
+ */
 import AcmeLogo from '@/app/ui/acme-logo';
 import { ArrowRightIcon } from '@heroicons/react/24/outline';
 import Link from 'next/link';
@@ -5,44 +14,76 @@ import Link from 'next/link';
 import styles from '@/app/ui/home.module.css';
 import { lusitana } from '@/app/ui/fonts';
 import Image from 'next/image';
+import datasource from '@/app/lib/bookmarks.json'
+import { BookmarkType } from '@/app/lib/definitions'
+import { any } from 'zod';
+import { arrayToTree } from '@/app/lib/utils'
+import { BookMarkGroup } from './ui/bookmark';
+
+
+function bookmarkDataFormat(): Array<BookmarkType> {
+    // 将bookmark 放入title children 中
+    const bookmarks_json = datasource.bookmarks;
+    const titles_json = datasource.titles;
+
+    const titles = titles_json.map(title => {
+      return {
+        'title': title.title,
+        'icon': title.icon,
+        'uuid': title.uuid,
+        'parent_uuid': title.parent_uuid,
+        'children': [] as Array<BookmarkType>
+      }
+    })
+    // console.log('titles ', titles)
+
+    // 不在任何分组下
+    const top_levle_nodes = []
+
+    // 将页签归类到标题下
+    while(bookmarks_json.length > 0) {
+      const bm = bookmarks_json.pop();
+
+      if (bm?.parent_uuid === -1) {
+        // parent_uuid is -1 has not category
+        top_levle_nodes.push(bm)
+      } else {
+        const title = titles.find(title => title.uuid === bm?.parent_uuid);
+        if (title) {
+          title.children.push({
+            'title': bm?.title,
+            'uuid': bm?.uuid,
+            'icon': bm?.icon,
+            'parent_uuid': bm?.parent_uuid,
+            'href': bm?.href,
+            'add_date': bm?.add_date
+          })
+        }
+      }
+    }
+    // console.log('titles group ', titles)
+
+    // 整理标题，根据parent_uuid将标题组建树状结构
+    const title_nodes = arrayToTree(titles, -1);
+    return Array.prototype.concat(title_nodes, top_levle_nodes);
+}
 
 export default function Page() {
+  const bookmarks = bookmarkDataFormat();
+  // console.log('bookmarkDataFormat', bookmarks)
+
   return (
     <main className="flex min-h-screen flex-col p-6">
-      <div className="flex h-20 shrink-0 items-end rounded-lg bg-blue-500 p-4 md:h-52">
-        <AcmeLogo />
-      </div>
-      <div className="mt-4 flex grow flex-col gap-4 md:flex-row">
-        <div className="flex flex-col justify-center gap-6 rounded-lg bg-gray-50 px-6 py-10 md:w-2/5 md:px-20">
-          {/* <div className={styles.shape}></div> */}
-          <div
-            className="h-0 w-0 border-b-[30px] border-l-[20px] border-r-[20px] border-b-black border-l-transparent border-r-transparent"
-          />
-          <p className={`${lusitana.className} text-xl text-gray-800 md:text-3xl md:leading-normal`}>
-            <strong>Welcome to Acme.</strong> This is the example for the{' '}
-            <a href="https://nextjs.org/learn/" className="text-blue-500">
-              Next.js Learn Course
-            </a>
-            , brought to you by Vercel.
-          </p>
-          <Link
-            href="/login"
-            className="flex items-center gap-5 self-start rounded-lg bg-blue-500 px-6 py-3 text-sm font-medium text-white transition-colors hover:bg-blue-400 md:text-base"
-          >
-            <span>Log in</span> <ArrowRightIcon className="w-5 md:w-6" />
-          </Link>
-        </div>
-        <div className="flex items-center justify-center p-6 md:w-3/5 md:px-28 md:py-12">
-          {/* Add Hero Images Here */}
-          <Image
-            src="/hero-desktop.png"
-            width={1000}
-            height={760}
-            className="hidden md:block"
-            alt="Screenshots of the dashboard project showing desktop version"
-          />
-        </div>
-      </div>
+      {
+        bookmarks.map(bookmark => {
+          return (
+            <BookMarkGroup
+              key={bookmark.uuid} 
+              {...bookmark}
+            />
+          )
+        })
+      }
     </main>
   );
 }

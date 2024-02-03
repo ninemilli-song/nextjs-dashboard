@@ -8,3 +8,14 @@ study:
 https://nextjs.org/learn/dashboard-app/optimizing-fonts-images
 
 https://nextjs.org/learn/dashboard-app/error-handling
+
+## Develop log
+
+### 2024/01/22
+
+1. 将chrome导出的书签导出，并转换为json文件
+添加脚本“chrome_bookmarks_to_json” **python-garden** 
+
+### 2024/01/23
+
+

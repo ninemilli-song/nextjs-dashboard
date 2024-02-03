@@ -67,3 +67,41 @@ export const generatePagination = (currentPage: number, totalPages: number) => {
     totalPages,
   ];
 };
+
+/**
+ * 数组转树形结构
+ * @param {array} list 被转换的数组
+ * @param {number|string} root 根节点（最外层节点）的 id
+ * @return array
+ */
+export function arrayToTree(list : Array<any>, root = -1) {
+  const result = [] // 用于存放结果
+  const map = {} as any // 用于存放 list 下的节点
+
+  // 1. 遍历 list，将 list 下的所有节点以 id 作为索引存入 map
+  for (const item of list) {
+    map[item.uuid] = { ...item } // 浅拷贝
+  }
+
+  // 2. 再次遍历，将根节点放入最外层，子节点放入父节点
+  for (const item of list) {
+    // 3. 获取节点的 id 和 父 id
+    const { uuid, parent_uuid } = item // ES6 解构赋值
+    // 4. 如果是根节点，存入 result
+    if (item.parent_uuid === root) {
+      result.push(map[uuid])
+    } else {
+      try {
+      // 5. 反之，存入到父节点
+      map[parent_uuid].children
+        ? map[parent_uuid].children.push(map[uuid])
+        : (map[parent_uuid].children = [map[uuid]])
+      } catch (e) {
+        console.error('add children error', parent_uuid, uuid)
+      }
+    }
+  }
+
+  // 将结果返回
+  return result
+}

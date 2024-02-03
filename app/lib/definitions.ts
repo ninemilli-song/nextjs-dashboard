@@ -86,3 +86,19 @@ export type InvoiceForm = {
   amount: number;
   status: 'pending' | 'paid';
 };
+
+/**
+ * 书签类型
+ */
+export type BookmarkType = {
+  id?: string;
+  uuid: string | undefined;
+  href?: string;
+  icon?: string | null;
+  title?: string;
+  description?: string;
+  update_date?: number;
+  add_date?: string;
+  parent_uuid?: string | number;
+  children?: Array<BookmarkType>
+};
