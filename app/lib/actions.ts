@@ -6,6 +6,9 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { signIn } from '@/auth';
 import { AuthError } from 'next-auth';
+import bookmarks_datasource from '@/app/lib/bookmarks.json';
+import { arrayToTree } from '@/app/lib/utils';
+import { BookmarkType } from './definitions';
 
 export type State = {
   errors?: {
@@ -139,4 +142,54 @@ export async function authenticate(
     throw error;
   }
 }
+
+export async function getBookmarks(): Promise<BookmarkType[]> {
+    return new Promise<BookmarkType[]>((resolve, reject) => {
+    // 将bookmark 放入title children 中
+    const bookmarks_json = Array.prototype.concat([], bookmarks_datasource.bookmarks);
+    const titles_json = Array.prototype.concat([], bookmarks_datasource.titles);
+
+    const titles = titles_json.map(title => {
+      return {
+        'title': title.title,
+        'icon': title.icon,
+        'uuid': title.uuid,
+        'parent_uuid': title.parent_uuid,
+        'children': [] as Array<BookmarkType>
+      }
+    })
+    // console.log('titles ', titles)
+
+    // 不在任何分组下
+    const top_levle_nodes = []
+
+    // 将页签归类到标题下
+    while(bookmarks_json.length > 0) {
+      const bm = bookmarks_json.pop();
+
+      if (bm?.parent_uuid === -1) {
+        // parent_uuid is -1 has not category
+        top_levle_nodes.push(bm)
+      } else {
+        const title = titles.find(title => title.uuid === bm?.parent_uuid);
+        if (title) {
+          title.children.push({
+            'title': bm?.title,
+            'uuid': bm?.uuid,
+            'icon': bm?.icon,
+            'parent_uuid': bm?.parent_uuid,
+            'href': bm?.href,
+            'add_date': bm?.add_date
+          })
+        }
+      }
+    }
+    // console.log('titles group ', titles)
+
+    // 整理标题，根据parent_uuid将标题组建树状结构
+    const title_nodes = arrayToTree(titles, -1);
+    resolve(Array.prototype.concat(title_nodes, top_levle_nodes));
+  })
+}
+
   

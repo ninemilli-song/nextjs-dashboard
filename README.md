@@ -1,3 +1,10 @@
+<!--
+ * @Author: ninemilli.song ninemilli_song@163.com
+ * @Date: 2023-11-29 20:44:04
+ * @FilePath: /nextjs-dashboard/README.md
+ * @Description: 
+ * 
+-->
 ## Next.js App Router Course - Starter
 
 This is the starter template for the Next.js App Router Course. It contains the starting code for the dashboard application.
@@ -18,4 +25,5 @@ https://nextjs.org/learn/dashboard-app/error-handling
 
 ### 2024/01/23
 
-
+### 2024/02/03
+1. 页签数据处理 2. 页面显示
