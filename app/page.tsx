@@ -2,12 +2,11 @@
  * @Author: ninemilli.song ninemilli_song@163.com
  * @Date: 2023-11-29 20:44:04
  * @LastEditors: Please set LastEditors
- * @LastEditTime: 2024-02-03 16:20:56
+ * @LastEditTime: 2024-02-22 16:42:07
  * @FilePath: /nextjs-dashboard/app/page.tsx
  * @Description: 
  * 
  */
-// "use client"
 import AcmeLogo from '@/app/ui/acme-logo';
 import { ArrowRightIcon } from '@heroicons/react/24/outline';
 import Link from 'next/link';
@@ -28,7 +27,7 @@ export default async function Page() {
   // console.log('bookmarkDataFormat', bookmarks)
 
   return (
-    <main className="flex min-h-screen flex-col p-6">
+    <main className="min-h-screen p-6 space-y-4">
       {
         bookmarks.map(bookmark => {
           return (
